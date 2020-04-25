@@ -9,7 +9,7 @@ import win32api
 import win32con
 
 def sendenter(hwnd):
-    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0
     win32api.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
         #win32api.SendMessage(hwndChild, win32con.WM_CHAR, 0x28, 0)
 
@@ -59,7 +59,6 @@ print(game_hwnd)
 def checkforchallenge():
     previous_answer = ''
     while True:
-        found = False
         time.sleep(0.2)
         regions = mem.process.iter_region(start_offset=mods, protec=PAGE_READWRITE)
         challengemessage = ''
@@ -79,14 +78,11 @@ def checkforchallenge():
             if previous_answer == line or line == 'XXX' or line is None:
                 continue
             try:
-                found = True
                 previous_answer = line
                 print "Line: " + line
                 sendstring(line, game_hwnd, True)
                 break
             except:
                 print 'Exception in check for challenge'
-        if found:
-            continue
 
 checkforchallenge()
