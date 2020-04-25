@@ -3,12 +3,8 @@ from memorpy import *
 from ctypes import *
 from ctypes.wintypes import *
 from memorpy.WinStructures import PAGE_READWRITE
-import win32ui
 import win32gui
-import sys
 import win32process
-import ast
-import operator as op
 import win32api
 import win32con
 
@@ -23,27 +19,7 @@ def sendstring(strtosend, hwnd, enter):
     if enter:
         sendenter(hwnd)
 
-operators = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
-             ast.Div: op.truediv, ast.Pow: op.pow, ast.BitXor: op.xor,
-             ast.USub: op.neg}
 
-allowed = string.digits
-def eval_(node):
-    if isinstance(node, ast.Num): # <number>
-        return node.n
-    elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-        return operators[type(node.op)](eval_(node.left), eval_(node.right))
-    elif isinstance(node, ast.UnaryOp): # <operator> <operand> e.g., -1
-        return operators[type(node.op)](eval_(node.operand))
-
-
-def eval_expr(expr):
-    try:
-        #filtered = list(filter(allowed.__contains__, expr))
-        #filtered = ''.join(filtered)
-        return str(eval_(ast.parse(expr, mode='eval').body))
-    except:
-        return ''
 parser = argparse.ArgumentParser()
 parser.add_argument("--pid")
 parser.add_argument("--name")
@@ -59,7 +35,6 @@ modules = mem.process.list_modules()
 def aob_scan(mem, start, size, pattern=None, offset=0, entity_check=False):
     all_the_bytes = mem.process.read(mem.Address(start), type='bytes', maxlen=size)
     matches = re.finditer(pattern, all_the_bytes)
-    #print(all_the_bytes)
     results = []
     for match in matches:
         span = match.span()
@@ -67,7 +42,6 @@ def aob_scan(mem, start, size, pattern=None, offset=0, entity_check=False):
             address = start + span[0] + offset
             addressval = mem.Address(address).read(type='string', errors='ignore')
             results.append(addressval)
-            #return results
             mem.Address(address).write('Please type the following sequence:\nXXX', type='bytes')
     return results
 
@@ -96,10 +70,8 @@ def checkforchallenge():
 
         if challengemessage is None or challengemessage is '':
             continue
-        #challengemessage = challengemessage.replace(" ", "")
         
         newlines = challengemessage.splitlines()
-        #print(previous_message)
         for i in range(len(newlines)):
             line = newlines[i]
             if "Please type the following sequence:" in line:
