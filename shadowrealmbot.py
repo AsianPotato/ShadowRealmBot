@@ -7,7 +7,6 @@ import win32ui
 import win32gui
 import sys
 import win32process
-import numpy as np
 import ast
 import operator as op
 import win32api
@@ -69,7 +68,7 @@ def aob_scan(mem, start, size, pattern=None, offset=0, entity_check=False):
             address = start + span[0] + offset
             addressval = mem.Address(address).read(type='string', errors='ignore')
             #print(addressval)
-            if "= ?" in addressval:
+            if pattern in addressval:
                 if not found:
                     found = True
                     results.append(addressval)
@@ -93,7 +92,7 @@ def checkforchallenge():
         regions = mem.process.iter_region(start_offset=mods, protec=PAGE_READWRITE)
         challengemessage = ''
         for start, size in regions:
-            res = aob_scan(mem, start, size, pattern='Please type the following sequence:', offset=0)
+            res = aob_scan(mem, start, size, pattern='following sequence', offset=0)
             if res is not None:
                 challengemessage += ''.join(res)
 
