@@ -61,18 +61,14 @@ def aob_scan(mem, start, size, pattern=None, offset=0, entity_check=False):
     matches = re.finditer(pattern, all_the_bytes)
     #print(all_the_bytes)
     results = []
-    found = False
     for match in matches:
         span = match.span()
         if span:
             address = start + span[0] + offset
             addressval = mem.Address(address).read(type='string', errors='ignore')
-            #print(addressval)
-            if pattern in addressval:
-                if not found:
-                    found = True
-                    results.append(addressval)
-                mem.Address(address).write('dsadsadsa', type='bytes')
+            results.append(addressval)
+            #return results
+            mem.Address(address).write('Please type the following sequence:\nXXX', type='bytes')
     return results
 
 
@@ -87,32 +83,38 @@ else:
 game_hwnd = win32gui.FindWindow(None, windowname)
 print(game_hwnd)
 def checkforchallenge():
+    previous_answer = ''
     while True:
+        found = False
         time.sleep(0.2)
         regions = mem.process.iter_region(start_offset=mods, protec=PAGE_READWRITE)
         challengemessage = ''
         for start, size in regions:
-            res = aob_scan(mem, start, size, pattern='following sequence', offset=0)
+            res = aob_scan(mem, start, size, pattern='Please type the following sequence:\n\w\w\w', offset=0)
             if res is not None:
                 challengemessage += ''.join(res)
 
         if challengemessage is None or challengemessage is '':
             continue
-        challengemessage = challengemessage.replace(" ", "")
+        #challengemessage = challengemessage.replace(" ", "")
         
         newlines = challengemessage.splitlines()
-        answer = ""
         #print(previous_message)
         for i in range(len(newlines)):
             line = newlines[i]
-            if "Please type the following sequence" not in line:
+            if "Please type the following sequence:" in line:
+                line = line.replace("Please type the following sequence:", "")
+            if previous_answer == line or line == 'XXX' or line is None:
                 continue
-            line = newlines[i+1]
             try:
+                found = True
                 previous_answer = line
+                print "Line: " + line
                 sendstring(line, game_hwnd, True)
                 break
             except:
-                print('Exception in check for challenge')
+                print 'Exception in check for challenge'
+        if found:
+            continue
 
 checkforchallenge()
