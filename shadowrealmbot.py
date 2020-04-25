@@ -9,9 +9,9 @@ import win32api
 import win32con
 
 def sendenter(hwnd):
-    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
     win32api.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
-        #win32api.SendMessage(hwndChild, win32con.WM_CHAR, 0x28, 0)
+    #win32api.SendMessage(hwndChild, win32con.WM_CHAR, 0x28, 0)
 
 def sendstring(strtosend, hwnd, enter):
     for char in strtosend:
@@ -79,10 +79,10 @@ def checkforchallenge():
                 continue
             try:
                 previous_answer = line
-                print "Line: " + line
+                print("Line: " + line)
                 sendstring(line, game_hwnd, True)
                 break
             except:
-                print 'Exception in check for challenge'
+                print('Exception in check for challenge')
 
 checkforchallenge()
